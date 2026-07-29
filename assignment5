@@ -1,0 +1,653 @@
+
+-- Section 1: DDL (Data Definition Language) — Q1 to Q12
+
+-- 1. Create a database for the college records.
+
+create database College_Records
+use College_Records
+
+-- 2. Create the Department table.
+
+create table department 
+(
+	DepID int primary key,
+	DepName varchar(30)
+)
+
+select * from department
+
+-- 3. Create the Student table with all required columns.
+
+create table student 
+(
+	RollNo int primary key,
+	StuName varchar(30),
+	Course varchar(40),
+	Marks int,
+	City varchar(30),
+	Gender char(1),
+	Age int,
+	AdmissionDate date,
+	Fee decimal(10,2),
+	DepID int FOREIGN KEY REFERENCES department(DepID)
+)
+
+select * from student
+
+-- 4. Add a new column to the Student table to store the student's email address.
+
+alter table student
+add Email varchar(30)
+
+-- 5. Modify the data type/size of the email column you just added.
+
+alter table student
+alter column Email varchar(35)
+
+-- 6. Rename the newly added email column to something more suitable.
+
+sp_rename 'student.Stu_Email_id', 'Email_id'
+
+-- 7. Drop the email column from the Student table.
+
+alter table student 
+drop column Email_id
+
+-- 8. Rename the Student table to StudentRecords and then rename it back to Student.
+
+sp_rename 'Student', 'StudentRecords'
+select * from StudentRecords
+
+sp_rename 'StudentRecords', 'Student'
+select * from Student
+
+-- 9. Write a query to view the complete structure of the Student table.
+
+sp_help student
+
+-- 10. Write a query to view the complete structure of the Department table.
+
+sp_help department
+
+-- 11. Truncate all the data from the Department table and recreate it.
+
+truncate table department
+
+-- 12.Drop the Department table and create it again with the same structure.
+
+drop table department
+
+
+
+--------------- NEW SECTION --------------
+
+
+
+-- Section 2: Constraints — PK, FK, UNIQUE, NOT NULL, DEFAULT, CHECK — Q13 to Q32
+
+
+-- 13. Set the primary key on the Department table.
+
+alter table department
+add constraint Primary_key_Constraint primary key (Department)
+
+-- 14. Set the primary key on the Student table.
+
+alter table student
+add constraint Primary_key_Constraint primary key (RollNo)
+
+-- 15. Add a foreign key on the Student table that references the Department table.
+
+alter table student
+add constraint foreign_key_constraint foreign key (depid) references department(depid) -- SQL allows same type of foreign constarint to get added again with different name even though working of both constarint on same column is same as the first one
+
+sp_help student
+
+-- 16. Try inserting a student record with a department value that does not exist in the
+-- Department table and observe the result.
+
+insert into student values
+(1, 'Sujal', 'Computer Science', 88, 'Vadodara', 'M', 21, '2026-07-25', 25000.00, 101)
+
+select * from student
+
+-- 17. Apply a NOT NULL constraint on the student's name column.
+
+alter table student
+alter column StuName varchar(30) NOT NULL
+
+sp_help student
+
+-- 18. Apply a NOT NULL constraint on the course column.
+
+alter table student
+alter column Course varchar(40) NOT NULL
+
+sp_help student
+
+-- 19. Apply a UNIQUE constraint on a column that stores each student's roll number.
+
+alter table student
+add constraint Unique_RollNo unique (RollNo)
+
+sp_help student
+
+-- 20. Apply a UNIQUE constraint on the email column (add the column again if you had
+-- dropped it earlier).
+
+alter table student
+add Email varchar(40)
+
+alter table student 
+add constraint Unique_Email unique (Email)
+
+-- 21. Apply a DEFAULT constraint on the city column with a default value of your choice.
+
+alter table student 
+add constraint default_city default 'Vadodara' for city
+
+-- 22. Apply a DEFAULT constraint on the fee column with a default value.
+
+alter table student 
+add constraint default_fee default 30000 for fee
+
+select * from student
+
+-- 23. Apply a CHECK constraint on the marks column so that marks cannot be negative or
+-- greater than 100.
+
+alter table student 
+add constraint Check_Marks check (marks >= 0 AND marks <= 100)
+
+-- 24. Apply a CHECK constraint on the age column so that age must be greater than or
+-- equal to 15.
+
+alter table student 
+add constraint Check_Age check (Age >= 15)
+
+-- 25. Apply a CHECK constraint on the gender column so that only 'M' or 'F' can be
+-- entered.
+
+alter table student 
+add constraint Check_Gender check (Gender = 'M' or Gender = 'F')
+
+-- 26. Remove the CHECK constraint applied on the age column.
+
+alter table student 
+drop constraint Check_age
+
+-- 27. Remove the UNIQUE constraint applied on the roll number column.
+
+alter table student 
+drop constraint Unique_RollNo
+
+-- 28. Remove the DEFAULT constraint applied on the fee column.
+
+alter table student 
+drop constraint Default_fee
+
+-- 29. Remove the foreign key constraint from the Student table.
+
+alter table student 
+drop constraint foreign_key_constraint
+
+-- 30. Add the foreign key constraint back to the Student table.
+
+alter table student
+add constraint foreign_key_constraint foreign key (depid) references department(depid) -- SQL allows same type of foreign constarint to get added again with different name even though working of both constarint on same column is same as the first one
+
+sp_help student
+
+-- 31. Remove the primary key from the Department table and then reapply it.
+
+sp_help department -- PK__departme__DB9CAA7F87F86D08
+
+select * from Department
+
+alter table Department 
+drop constraint PK__departme__DB9CAA7F87F86D08 -- it will not allow it cuz it refers to the foreign key of student table had to remove the foreign key constraint first if you want to remove the primary key from department DepID
+
+alter table Department
+add constraint Primary_key primary key (DepID)
+
+-- 32. Try deleting a department from the Department table that is still referenced by a
+-- student and observe the result.
+select name from sys.tables
+
+delete from department
+where DepID = 101 -- conflict with foreign key error 
+
+
+
+--------------- NEW SECTION --------------
+
+
+
+-- Section 3: DML (Data Manipulation Language) — Q33 to Q47
+
+-- 33. Insert 5 records into the Department table.
+
+select * from department
+
+insert into department values
+(101,'IT'),
+(102,'AI'),
+(103,'QA'),
+(104,'HR'),
+(105,'ML')
+
+
+-- 34. Insert 20 records into the Student table with varied courses, cities, marks, and fees.
+
+select * from student
+
+insert into student values
+(1, 'Aarav Sharma', 'Computer Science', 85, 'Delhi', 'M', 20, '2023-08-10', 45000, 101, 'aarav.sharma2004@gmail.com'),
+(2, 'Ananya Iyer', 'Information Technology', 92, 'Mumbai', 'F', 21, '2023-08-12', 48000, 101, 'ananya_iyer99@yahoo.com'),
+(3, 'Rohan Verma', 'Mechanical Engg', 78, 'Bangalore', 'M', 22, '2022-07-15', 42000, 102, 'rohanv_mech@outlook.com'),
+(4, 'Priya Patel', 'Civil Engg', 65, 'Ahmedabad', 'F', 20, '2023-09-01', 38000, 102, 'patel.priya03@gmail.com'),
+(5, 'Kabir Mehta', 'Electrical Engg', 88, 'Pune', 'M', 21, '2022-08-20', 41000, 103, 'kabir_mehta_pune@yahoo.com'),
+(6, 'Sneha Rao', 'Computer Science', 95, 'Hyderabad', 'F', 19, '2024-01-10', 50000, 101, 'sneha.rao2005@gmail.com'),
+(7, 'Vikram Singh', 'Electronics', 72, 'Jaipur', 'M', 22, '2022-09-05', 39000, 103, 'singh.vikram98@hotmail.com'),
+(8, 'Diya Kapoor', 'Data Science', 89, 'Delhi', 'F', 20, '2023-08-15', 52000, 101, 'diya_kapoor_delhi@gmail.com'),
+(9, 'Arjun Reddy', 'Mechanical Engg', 68, 'Chennai', 'M', 21, '2023-07-18', 42000, 102, 'arjunreddy_02@yahoo.com'),
+(10, 'Ishita Joshi', 'Biotechnology', 91, 'Kolkata', 'F', 20, '2023-08-22', 46000, 104, 'ishita.j123@gmail.com'),
+(11, 'Aditya Gupta', 'Civil Engg', 58, 'Lucknow', 'M', 23, '2021-08-11', 37000, 102, 'aditya_gupta_lucknow@outlook.com'),
+(12, 'Neha Nair', 'Data Science', 84, 'Kochi', 'F', 20, '2023-09-05', 52000, 101, 'nehanair2004@gmail.com'),
+(13, 'Siddharth Das', 'Chemical Engg', 76, 'Bhubaneswar', 'M', 21, '2022-08-30', 40000, 105, 'sid.das2003@yahoo.com'),
+(14, 'Kavya Kulkarni', 'Biotechnology', 88, 'Pune', 'F', 19, '2024-01-15', 46000, 104, 'kavyakulkarni_pune@gmail.com'),
+(15, 'Gaurav Bhat', 'Electrical Engg', 63, 'Bangalore', 'M', 22, '2022-07-25', 41000, 103, 'gaurav.bhat01@hotmail.com'),
+(16, 'Riya Sen', 'Chemical Engg', 81, 'Kolkata', 'F', 20, '2023-08-18', 40000, 105, 'riya.sen.kol@gmail.com'),
+(17, 'Manish Kumar', 'Information Technology', 74, 'Patna', 'M', 21, '2023-08-14', 48000, 101, 'manish_kumar_patna@yahoo.com'),
+(18, 'Pooja Agarwal', 'Electronics', 90, 'Indore', 'F', 20, '2023-09-02', 39000, 103, 'pooja.agarwal2004@gmail.com'),
+(19, 'Devansh Deshmukh', 'Civil Engg', 69, 'Nagpur', 'M', 22, '2022-08-01', 38000, 102, 'devansh_d_nagpur@outlook.com'),
+(20, 'Tanvi Saxena', 'Biotechnology', 87, 'Delhi', 'F', 20, '2023-08-25', 46000, 104, 'tanvisaxena04@gmail.com')
+
+
+-- 35. Insert a record into the Student table without providing a value for the city column,
+-- to check the DEFAULT constraint.
+
+insert into student (RollNo, StuName, Course, Marks, Gender, Age, AdmissionDate, Fee, DepID, Email) values
+(21, 'Rohan Sharma', 'Computer Science', 82, 'M', 20, '2024-02-01', 45000, 101, 'rohan.sharma21@gmail.com')
+
+select * from student
+
+-- 36. Insert a record into the Student table without providing a value for the fee column, to
+-- check the DEFAULT constraint.
+
+insert into student (RollNo, StuName, Course, Marks, City, Gender, Age, AdmissionDate, DepID, Email) values 
+(22, 'Aarav Verma', 'Data Science', 88, 'Delhi', 'M', 20, '2024-02-05', 101, 'aarav.v22@gmail.com')
+
+select * from student
+
+-- 37.Update the marks of a student whose roll number is a specific value, increasing it by 5.
+
+update student 
+set marks = marks + 5
+where rollno = 4
+
+-- 38.Update the fee amount of all students belonging to a particular course.
+
+update student 
+set fee = 50000
+where course = 'Computer Science'
+
+-- 39.Update the city of a student from one city to another.
+
+update student
+set city = 'Vadodara'
+where city = 'Padra'
+
+-- 40.Update the department of a student to a different valid department.
+
+update student 
+set depID = 103
+where rollno = 3
+
+select * from student
+
+-- 41.Delete the record of a student with a specific roll number.
+
+delete from student 
+where rollno = 21
+
+-- 42.Delete all students whose marks are less than 35.
+
+delete from student 
+where marks < 35
+
+-- 43.Delete all students belonging to a particular city.
+
+delete from student 
+where city = 'padra'
+
+-- 44. Insert a record leaving the student name blank and check whether the NOT NULL
+-- constraint blocks it.
+
+insert into student (RollNo, StuName, Course, Marks, City, Gender, Age, AdmissionDate, Fee, DepID, Email) values 
+(23, NULL, 'Computer Science', 75, 'Mumbai', 'M', 21, '2024-02-10', 45000, 101, 'test.student23@gmail.com')
+
+-- 45. Insert a record with a duplicate roll number and check whether the UNIQUE
+-- constraint blocks it.
+
+insert into student (RollNo, StuName, Course, Marks, City, Gender, Age, AdmissionDate, Fee, DepID, Email) values 
+(15,'Harsh Prajapati', 'Computer Science', 75, 'Mumbai', 'M', 21, '2024-02-10', 45000, 101, 'test.student23@gmail.com')
+
+
+-- 46. Insert a record with age less than the allowed minimum and check whether -- the
+-- CHECK constraint blocks it.
+
+insert into student (RollNo, StuName, Course, Marks, City, Gender, Age, AdmissionDate, Fee, DepID, Email) values 
+(23,'Harsh Prajapati', 'Computer Science', 75, 'Mumbai', 'M', 14, '2024-02-10', 45000, 101, 'test.student23@gmail.com')
+
+select * from student
+
+-- 47.Update the marks of a student to a value greater than 100 and check whether the
+-- CHECK constraint blocks it.
+
+insert into student (RollNo, StuName, Course, Marks, City, Gender, Age, AdmissionDate, Fee, DepID, Email) values 
+(23,'Harsh Prajapati', 'Computer Science', 111, 'Mumbai', 'M', 14, '2024-02-10', 45000, 101, 'test.student23@gmail.com')
+
+
+
+--------------- NEW SECTION --------------
+
+
+
+-- Section 4: Operators — Q48 to Q62
+
+-- 48.Display all students whose marks are greater than 75.
+
+select * from student 
+where marks > 75
+
+-- 49.Display all students whose fee is less than or equal to 20,000.
+
+select * from student 
+where Fee <= 20000
+
+-- 50.Display all students whose age is not equal to 18.
+
+select * from student 
+where age <> 18  -- can also use '!='
+ 
+-- 51.Display all students belonging to the 'Computer Science' course AND having marks
+-- greater than 60.
+
+select * from student 
+where course = 'Computer Science' AND marks > 60
+
+-- 52.Display all students belonging to the 'Computer Science' course OR the 'Commerce'
+-- course.
+
+select * from student
+where course = 'Computer Science' OR Course = 'Commerce'
+
+-- 53.Display all students whose marks are BETWEEN 50 and 90.
+
+select * from student 
+where marks between 50 and 90
+
+-- 54.Display all students whose fee is BETWEEN 10,000 and 30,000.
+
+select * from student
+where fee between 10000 and 30000
+
+-- 55.Display all students whose city is IN ('Delhi', 'Jaipur', 'Ahmedabad').
+
+select * from student
+where city IN ('Delhi','Jaipur','Ahemdabad')
+
+-- 56.Display all students whose course is NOT IN ('Arts', 'Commerce').
+
+select * from student 
+where course Not in ('Arts', 'Commerce')
+
+-- 57.Display all students whose name starts with the letter 'S' using the LIKE operator.
+
+select * from student
+where StuName like 's%'
+
+-- 58.Display all students whose name ends with the letter 'n' using the LIKE operator.
+
+select * from student
+where StuName like '%n'
+
+-- 59.Display all students whose name contains the substring 'an' anywhere in it.
+
+select * from student
+where StuName like '%an%'
+
+-- 60.Display all students whose gender is 'F' and marks are greater than 80.
+
+select * from student 
+where gender = 'F' and marks > 80
+
+-- 61.Display all students whose department value IS NULL (if any).
+
+select * from student
+where DepID is NULL 
+
+-- 62.Display all students whose department value IS NOT NULL.
+
+select * from student
+where DepID is not null
+
+
+
+--------------- NEW SECTION --------------
+
+
+
+-- Section 5: Aggregation Functions — Q63 to Q80
+
+-- 63. Find the total number of students using COUNT.
+
+select count(rollno) as Student_count from Student
+
+-- 64. Find the total number of students who belong to the 'Computer Science' course.
+
+select count(rollno) as Stu_count from student
+where course = 'Computer science'
+
+select * from student
+
+-- 65. Find the total fee collected from all students using SUM.
+
+select sum(fee) as Sum_of_collected_Fee from student
+
+-- 66. Find the total fee collected from students of a specific course.
+
+select sum(fee) as sum_of_fee_cs from student
+where course = 'computer science'
+
+-- 67. Find the average marks of all students using AVG.
+
+select avg(marks) as avg_marks from student
+
+-- 68. Find the average fee paid by students belonging to a specific city.
+
+select avg(fee) as avg_fee_mumbai from student
+where city = 'mumbai'
+
+-- 69. Find the highest marks scored by any student using MAX.
+
+select max(marks) as topper_student from student
+
+-- 70. Find the lowest marks scored by any student using MIN.
+
+select min(marks) as future_topper from student
+
+-- 71. Find the highest fee paid by any student.
+
+select max(fee) as highest_fee from student
+
+-- 72. Find the lowest fee paid by any student.
+
+select min(fee) as lowest_Fee from student
+
+-- 73. Find the average age of all students.
+
+select avg(age) as avg_age from student
+ 
+-- 74. Find the total number of distinct courses offered, using COUNT with DISTINCT.
+
+select count(distinct course) as course_offered from student -- The DISTINCT keyword in SQL is used to remove duplicate rows from your query results.
+
+select * from student
+
+-- 75. Find the total number of distinct cities the students belong to.
+
+select count(distinct city) as distinct_cities_sum from student
+
+-- 76. Find the maximum age among all students.
+
+select max(age) as max_age from student
+
+-- 77. Find the minimum age among all students.
+
+select min(age) as min_age from student
+
+-- 78. Find the sum of marks of all students combined.
+
+select sum(marks) as sum_marks from student
+
+-- 79. Find the average marks of only the female students.
+
+select avg(marks) as Female_avg_marks from student 
+where gender = 'F'
+
+-- 80. Find the count of students who scored more than 90 marks.
+
+select count(rollno) as topper_stu_count from student
+where marks > 90
+
+
+
+--------------- NEW SECTION --------------
+
+
+
+-- Section 6: Clauses — GROUP BY, HAVING, ORDER BY — Q81 to Q100
+
+-- 81.Display the total number of students in each course, using GROUP BY.
+
+select course, count(rollno) as Stu_count from student
+group by course
+
+-- 82.Display the average marks of students, grouped by course.
+
+select course, avg(marks) as avg_marks from student
+group by course
+
+-- 83.Display the total fee collected, grouped by department.
+
+select DepID,sum(fee) as sum_fee from student
+group by DepID
+
+select * from student
+
+-- 84.Display the maximum marks scored, grouped by city.
+
+select city, max(marks) as Max_marks from student
+group by city
+
+-- 85.Display the minimum age, grouped by gender.
+
+select gender, min(age) as Min_age from student
+group by gender
+
+-- 86.Display the count of students, grouped by city.
+
+select city, count(rollno) as Stu_count from student
+group by city
+
+-- 87.Display the average fee, grouped by course and city together.
+
+select course, city, avg(fee) as avg_fee from Student
+group by course,city
+
+-- 88.Display the sum of marks, grouped by department.
+
+select DepID, sum(marks) as Sum_Marks from Student
+group by DepID
+
+-- 89.Display courses having more than 5 students enrolled, using HAVING.
+
+select course, count(rollno) as Stu_enrolled from Student
+group by course
+having count(rollno) > 5
+
+-- 90.Display cities having an average fee greater than 15,000, using HAVING.
+
+select city, avg(fee) as avg_fee from student
+group by city
+having avg(fee) > 15000
+
+-- 91.Display departments having a total student count greater than 3, using HAVING.
+
+select DepID, count(rollno) as Stu_count from Student
+group by depid
+having count(rollno) > 3
+
+-- 92.Display courses having an average marks greater than 70, using HAVING.
+
+select course, avg(marks) as avg_marks from student
+group by course
+having avg(marks) > 70
+
+-- 93.Display genders having a maximum marks value greater than 95, using HAVING.
+
+select gender, max(marks) as max_marks from Student
+group by gender
+having max(marks) > 95
+
+-- 94.Display all student records sorted by marks in descending order, using ORDER BY.
+
+select * from student
+order by marks DESC
+
+-- 95.Display all student records sorted by fee in ascending order.
+
+select * from Student
+order by fee ASC -- default value of order by is 'ASC', writting ASC or not, both gives same result
+
+-- 96.Display all student records sorted by course (ascending) and then marks
+-- (descending).
+
+select * from Student
+order by course ASC, marks DESC
+
+-- 97.Display all student records sorted by admission date, showing the most recently
+-- admitted students first.
+
+select * from student
+order by admissiondate DESC
+
+-- 98.Display the top 10 students with the highest marks, using ORDER BY along with a
+-- row-limiting clause.
+
+select top 10 * from student
+order by marks DESC
+
+/*
+Without ORDER BY: SQL Server processes table data in no guaranteed order (often physical storage/insertion order). So TOP 10 simply grabs the first 10 rows it encounters in the table (usually RollNo 1 through 10).
+With ORDER BY Marks DESC: SQL Server sorts the entire table first by marks from highest to lowest, and then TOP 10 slices off the highest 10 scores from that sorted list.
+*/
+
+-- 99.Display all distinct courses sorted alphabetically.
+
+select distinct course from Student -- The DISTINCT keyword in SQL is used to remove duplicate rows from your query results.
+order by course ASC
+
+-- another way gives same results
+select course from Student
+group by course
+order by course ASC
+
+-- 100. Display department-wise student count sorted from highest to lowest count,
+-- combining GROUP BY and ORDER BY.
+
+select depid, count(rollno) as stu_count from Student
+group by depid
+order by count(rollno) DESC
